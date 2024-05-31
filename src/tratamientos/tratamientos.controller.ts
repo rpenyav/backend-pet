@@ -8,9 +8,12 @@ import {
   Body,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TratamientosService } from './tratamientos.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PaginatedResponse } from 'src/interface/paginated';
+import { Tratamiento } from './tratamiento.schema';
 
 @Controller('tratamientos')
 @UseGuards(JwtAuthGuard)
@@ -23,8 +26,18 @@ export class TratamientosController {
   }
 
   @Get()
-  findAll() {
-    return this.tratamientosService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('orderBy') orderBy: string = 'name',
+    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<Tratamiento>> {
+    return this.tratamientosService.findAll(
+      page,
+      limit,
+      orderBy,
+      orderDirection,
+    );
   }
 
   @Get(':id')

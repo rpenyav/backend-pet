@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import * as bcrypt from 'bcrypt';
+import { PaginatedResponse } from 'src/interface/paginated';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,35 @@ export class UsersService {
     return createdUser;
   }
 
-  // Método para encontrar todos los usuarios
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+  async findAll(
+    page: number,
+    limit: number,
+    orderBy: string = 'name',
+    orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<User>> {
+    const skip = (page - 1) * limit;
+
+    const query = this.userModel
+      .find()
+      .sort({ [orderBy]: orderDirection === 'ASC' ? 1 : -1 })
+      .skip(skip)
+      .limit(limit);
+    const [list, totalElements] = await Promise.all([
+      query.exec(),
+      this.userModel.countDocuments().exec(),
+    ]);
+
+    const totalPages = Math.ceil(totalElements / limit);
+    const isLast = page >= totalPages;
+
+    return {
+      list,
+      pageNumber: page,
+      pageSize: limit,
+      totalElements,
+      totalPages,
+      isLast,
+    };
   }
 
   // Método para encontrar un usuario específico por ID

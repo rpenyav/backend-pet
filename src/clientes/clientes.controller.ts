@@ -7,9 +7,12 @@ import {
   Body,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PaginatedResponse } from 'src/interface/paginated';
+import { Cliente } from './cliente.schema';
 
 @Controller('clientes')
 @UseGuards(JwtAuthGuard)
@@ -22,8 +25,13 @@ export class ClientesController {
   }
 
   @Get()
-  findAll() {
-    return this.clientesService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('orderBy') orderBy: string = 'name',
+    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<Cliente>> {
+    return this.clientesService.findAll(page, limit, orderBy, orderDirection);
   }
 
   @Get(':id')

@@ -9,11 +9,14 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { PaginatedResponse } from 'src/interface/paginated';
+import { User } from './user.schema';
 
 @Controller('users')
 export class UsersController {
@@ -34,9 +37,13 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('orderBy') orderBy: string = 'name',
+    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<User>> {
+    return this.usersService.findAll(page, limit, orderBy, orderDirection);
   }
 
   @Get(':id')

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Paciente, PacienteDocument } from './paciente.schema';
+import { PaginatedResponse } from 'src/interface/paginated';
 
 @Injectable()
 export class PacientesService {
@@ -14,8 +15,35 @@ export class PacientesService {
     return createdPaciente.save();
   }
 
-  async findAll(): Promise<Paciente[]> {
-    return this.pacienteModel.find().exec();
+  async findAll(
+    page: number,
+    limit: number,
+    orderBy: string = 'name',
+    orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<Paciente>> {
+    const skip = (page - 1) * limit;
+
+    const query = this.pacienteModel
+      .find()
+      .sort({ [orderBy]: orderDirection === 'ASC' ? 1 : -1 })
+      .skip(skip)
+      .limit(limit);
+    const [list, totalElements] = await Promise.all([
+      query.exec(),
+      this.pacienteModel.countDocuments().exec(),
+    ]);
+
+    const totalPages = Math.ceil(totalElements / limit);
+    const isLast = page >= totalPages;
+
+    return {
+      list,
+      pageNumber: page,
+      pageSize: limit,
+      totalElements,
+      totalPages,
+      isLast,
+    };
   }
 
   async findOne(id: string): Promise<Paciente> {

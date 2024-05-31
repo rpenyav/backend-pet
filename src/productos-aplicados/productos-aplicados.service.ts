@@ -6,6 +6,7 @@ import {
   ProductoAplicado,
   ProductoAplicadoDocument,
 } from './producto-aplicado.schema';
+import { PaginatedResponse } from 'src/interface/paginated';
 
 @Injectable()
 export class ProductosAplicadosService {
@@ -21,8 +22,35 @@ export class ProductosAplicadosService {
     return createdProductoAplicado.save();
   }
 
-  async findAll(): Promise<ProductoAplicado[]> {
-    return this.productoAplicadoModel.find().exec();
+  async findAll(
+    page: number,
+    limit: number,
+    orderBy: string = 'name',
+    orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<PaginatedResponse<ProductoAplicado>> {
+    const skip = (page - 1) * limit;
+
+    const query = this.productoAplicadoModel
+      .find()
+      .sort({ [orderBy]: orderDirection === 'ASC' ? 1 : -1 })
+      .skip(skip)
+      .limit(limit);
+    const [list, totalElements] = await Promise.all([
+      query.exec(),
+      this.productoAplicadoModel.countDocuments().exec(),
+    ]);
+
+    const totalPages = Math.ceil(totalElements / limit);
+    const isLast = page >= totalPages;
+
+    return {
+      list,
+      pageNumber: page,
+      pageSize: limit,
+      totalElements,
+      totalPages,
+      isLast,
+    };
   }
 
   async findOne(id: string): Promise<ProductoAplicado> {
