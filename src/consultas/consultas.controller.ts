@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ConsultasService } from './consultas.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -25,8 +26,14 @@ export class ConsultasController {
   }
 
   @Get()
-  findAll() {
-    return this.consultasService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('orderBy') orderBy: string = 'fechaConsulta',
+    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC',
+  ) {
+    return this.consultasService.findAll(page, limit, orderBy, orderDirection);
   }
 
   @Get(':id')
