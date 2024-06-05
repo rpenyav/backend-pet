@@ -54,7 +54,7 @@ export class UsersController {
 
   @Get('email/:email')
   @UseGuards(JwtAuthGuard) // Requiere autenticación para encontrar un usuario específico
-  findOne(@Param('email') email: string) {
+  findByEmail(@Param('email') email: string) {
     return this.usersService.findByEmail(email);
   }
 
