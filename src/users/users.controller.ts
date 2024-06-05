@@ -52,6 +52,12 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get('email/:email')
+  @UseGuards(JwtAuthGuard) // Requiere autenticación para encontrar un usuario específico
+  findOne(@Param('email') email: string) {
+    return this.usersService.findByEmail(email);
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard) // Requiere autenticación para actualizar un usuario
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
