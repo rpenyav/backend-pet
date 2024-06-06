@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -36,13 +37,17 @@ export class OrdersController {
     return this.ordersService.update(id, updateOrderDto);
   }
 
-  @Put(':id/close')
-  close(@Param('id') id: string) {
-    return this.ordersService.closeOrder(id);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ordersService.remove(id);
+  }
+
+  @Get('open/:tableId')
+  async findOpenOrderForTable(@Param('tableId') tableId: string) {
+    const openOrder = await this.ordersService.findOpenOrderForTable(tableId);
+    if (!openOrder) {
+      throw new NotFoundException('No open order found for this table.');
+    }
+    return openOrder;
   }
 }

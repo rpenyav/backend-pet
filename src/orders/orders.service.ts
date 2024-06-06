@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Order, OrderDocument, OrderStatus } from './schemas/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order, OrderDocument } from './schemas/order.schema';
 import { PaginatedResponse } from 'src/interface/paginated';
 
 @Injectable()
@@ -12,21 +16,18 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
   ) {}
 
-  private calculateTotalAmount(
-    orderItems: { quantity: number; price: number }[],
-  ): number {
-    return orderItems.reduce(
-      (total, item) => total + item.quantity * item.price,
-      0,
-    );
-  }
-
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const totalAmount = this.calculateTotalAmount(createOrderDto.orderItems);
-    const createdOrder = new this.orderModel({
-      ...createOrderDto,
-      totalAmount,
-    });
+    const existingOrder = await this.orderModel
+      .findOne({ tableId: createOrderDto.tableId, status: OrderStatus.OPEN })
+      .exec();
+
+    if (existingOrder) {
+      throw new BadRequestException(
+        'There is already an open order for this table.',
+      );
+    }
+
+    const createdOrder = new this.orderModel(createOrderDto);
     return createdOrder.save();
   }
 
@@ -58,9 +59,10 @@ export class OrdersService {
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    const totalAmount = this.calculateTotalAmount(updateOrderDto.orderItems);
     const updatedOrder = await this.orderModel
-      .findByIdAndUpdate(id, { ...updateOrderDto, totalAmount }, { new: true })
+      .findByIdAndUpdate(id, updateOrderDto, {
+        new: true,
+      })
       .exec();
     if (!updatedOrder) {
       throw new NotFoundException(`Order with ID ${id} not found`);
@@ -76,21 +78,9 @@ export class OrdersService {
     return deletedOrder;
   }
 
-  async closeOrder(id: string): Promise<Order> {
-    const order = await this.orderModel.findById(id).exec();
-    if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
-    }
-
-    const tax = order.totalAmount * 0.21;
-    const tip = order.totalAmount * 0.05;
-    const finalAmount = order.totalAmount + tax + tip;
-
-    order.status = 'closed';
-    order.tax = tax;
-    order.tip = tip;
-    order.finalAmount = finalAmount;
-
-    return order.save();
+  async findOpenOrderForTable(tableId: string): Promise<Order> {
+    return this.orderModel
+      .findOne({ tableId, status: OrderStatus.OPEN })
+      .exec();
   }
 }
