@@ -18,4 +18,7 @@ export class CreateMenuItemDto {
 
   @IsBoolean()
   aptoCeliacos: boolean;
+
+  @IsString()
+  readonly imagen: string;
 }

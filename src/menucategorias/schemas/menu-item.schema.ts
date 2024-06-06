@@ -20,6 +20,9 @@ export class MenuItem extends Document {
 
   @Prop({ required: true })
   aptoCeliacos: boolean;
+
+  @Prop({ required: true }) // Nueva propiedad
+  imagen: string;
 }
 
 export const MenuItemSchema = SchemaFactory.createForClass(MenuItem);

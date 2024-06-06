@@ -12,6 +12,9 @@ export class Category extends Document {
 
   @Prop({ type: [MenuItemSchema], default: [] })
   items: Types.DocumentArray<MenuItem>;
+
+  @Prop({ required: true }) // Nueva propiedad
+  imagen: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

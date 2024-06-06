@@ -32,7 +32,7 @@ export class CategoriesService {
     const isLast = page * size >= totalElements;
 
     return {
-      categories,
+      data: categories, // Cambiado a 'data' para la consistencia con el frontend
       pageNumber: page,
       pageSize: size,
       totalElements,

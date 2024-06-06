@@ -13,4 +13,7 @@ export class CreateCategoryDto {
   @Type(() => CreateMenuItemDto)
   @IsArray()
   items: CreateMenuItemDto[];
+
+  @IsString()
+  readonly imagen: string;
 }
