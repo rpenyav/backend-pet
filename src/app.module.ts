@@ -11,6 +11,7 @@ import { ProductosAplicadosModule } from './productos-aplicados/productos-aplica
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SectorModule } from './sector/sector.module';
+import { CategoriesModule } from './menucategorias/categories.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SectorModule } from './sector/sector.module';
     TratamientosModule, // Añadir TratamientosModule
     ProductosAplicadosModule,
     SectorModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
