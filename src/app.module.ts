@@ -10,6 +10,7 @@ import { TratamientosModule } from './tratamientos/tratamientos.module'; // Aña
 import { ProductosAplicadosModule } from './productos-aplicados/productos-aplicados.module'; // Añadir ProductosAplicadosModule
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SectorModule } from './sector/sector.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AppService } from './app.service';
     ClientesModule,
     PacientesModule,
     TratamientosModule, // Añadir TratamientosModule
-    ProductosAplicadosModule, // Añadir ProductosAplicadosModule
+    ProductosAplicadosModule,
+    SectorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
