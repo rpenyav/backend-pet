@@ -13,6 +13,10 @@ import { AppService } from './app.service';
 import { SectorModule } from './sector/sector.module';
 import { CategoriesModule } from './menucategorias/categories.module';
 import { OrdersModule } from './orders/orders.module';
+import { ComidaModule } from './comidas/comida.module';
+import { FacturaModule } from './facturas/factura.module';
+import { PedidoModule } from './pedidos/pedido.module';
+import { SalaModule } from './salas/sala.module';
 
 @Module({
   imports: [
@@ -36,6 +40,10 @@ import { OrdersModule } from './orders/orders.module';
     SectorModule,
     CategoriesModule,
     OrdersModule,
+    SalaModule,
+    ComidaModule,
+    PedidoModule,
+    FacturaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
