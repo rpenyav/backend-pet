@@ -1,3 +1,4 @@
+// factura.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -39,5 +40,27 @@ export class FacturaService {
       totalPages,
       isLast,
     };
+  }
+
+  async search(filters: {
+    searchTerm: string;
+    date: string;
+    amount: number;
+  }): Promise<Factura[]> {
+    const query: any = {};
+    if (filters.searchTerm) {
+      query['desglose.plato'] = { $regex: filters.searchTerm, $options: 'i' };
+    }
+    if (filters.date) {
+      const startDate = new Date(filters.date);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      query.fecha = { $gte: startDate, $lt: endDate };
+    }
+    if (filters.amount) {
+      query.facturacion_total = filters.amount;
+    }
+
+    return this.facturaModel.find(query).exec();
   }
 }

@@ -1,6 +1,8 @@
+// create-factura.dto.ts
 export class CreateFacturaDto {
   fecha: Date;
   facturacion_total: number;
+  identificador_pedido: string; // Nuevo campo para el identificador del pedido
   desglose: {
     plato: string;
     precio: number;

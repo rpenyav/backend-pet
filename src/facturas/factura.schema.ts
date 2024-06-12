@@ -1,3 +1,4 @@
+// factura.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -41,6 +42,9 @@ export class Factura extends Document {
 
   @Prop({ required: true })
   total: number;
+
+  @Prop({ required: true })
+  identificador_pedido: string; // Nuevo campo para el identificador del pedido
 }
 
 export const FacturaSchema = SchemaFactory.createForClass(Factura);
